@@ -125,6 +125,7 @@ export class ProjectService {
           status: TaskStatus.PENDING,
           priority,
           dueDate,
+          userId,
         });
         await queryRunner.manager.save(newTask);
 

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskTypeOrmEntity } from 'src/libs/typeorm/entities/task.typeorm-entity';
 import { Repository } from 'typeorm';
@@ -32,5 +36,23 @@ export class TaskService {
     }
 
     return rootTasks;
+  }
+
+  async deleteTask(taskId: string, userId: string) {
+    const task = await this.taskRepository.findOne({
+      where: { id: taskId },
+      relations: { subtasks: true },
+    });
+
+    if (!task) throw new NotFoundException('Task not found');
+
+    if (task && task.userId !== userId)
+      throw new UnauthorizedException(
+        'You are not authorized to delete this task',
+      );
+
+    await this.taskRepository.remove(task);
+
+    return { message: 'Task deleted successfully' };
   }
 }

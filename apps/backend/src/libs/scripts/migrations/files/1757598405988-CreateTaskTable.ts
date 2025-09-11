@@ -13,6 +13,7 @@ export class CreateTaskTable1757598405988 implements MigrationInterface {
     sourceColumnName: string,
     targetTableName: string,
     targetColumnName: string,
+    onDelete: 'CASCADE' | 'SET NULL' | 'NO ACTION' = 'NO ACTION',
   ) => {
     return new TableForeignKey({
       name: `FK-${this.tableName}-${targetTableName}-${sourceColumnName}`.slice(
@@ -22,12 +23,13 @@ export class CreateTaskTable1757598405988 implements MigrationInterface {
       columnNames: [sourceColumnName],
       referencedColumnNames: [targetColumnName],
       referencedTableName: targetTableName,
+      onDelete,
     });
   };
 
   private foreignKeys = [
-    this.foreignKeyConstructor('project_id', 'projects', 'id'),
-    this.foreignKeyConstructor('parent_task_id', 'tasks', 'id'),
+    this.foreignKeyConstructor('project_id', 'projects', 'id', 'CASCADE'),
+    this.foreignKeyConstructor('parent_task_id', 'tasks', 'id', 'CASCADE'),
   ];
 
   public async up(queryRunner: QueryRunner): Promise<void> {

@@ -48,7 +48,9 @@ export class TaskTypeOrmEntity extends BaseTimestampzTypeOrmEntity {
   @JoinColumn({ name: 'parent_task_id' })
   parentTask?: TaskTypeOrmEntity;
 
-  @ManyToOne(() => ProjectTypeOrmEntity, (project) => project.tasks)
+  @ManyToOne(() => ProjectTypeOrmEntity, (project) => project.tasks, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'project_id' })
   project?: ProjectTypeOrmEntity;
 
