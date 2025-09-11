@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTypeOrmEntity } from './base.typeorm-entity';
+import { ProjectTypeOrmEntity } from './project.typeorm-entity';
 
 @Entity({ name: 'users' })
 export class UserTypeOrmEntity extends BaseTypeOrmEntity {
@@ -14,4 +15,7 @@ export class UserTypeOrmEntity extends BaseTypeOrmEntity {
 
   @Column({ name: 'password', type: 'varchar', nullable: false })
   password: string;
+
+  @OneToMany(() => ProjectTypeOrmEntity, (project) => project.user)
+  projects: ProjectTypeOrmEntity[];
 }
