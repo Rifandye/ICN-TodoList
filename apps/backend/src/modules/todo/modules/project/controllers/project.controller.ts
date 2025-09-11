@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ProjectService } from '../services/project.service';
 import { AuthGuard } from 'src/libs/core/guards/jwt-auth.guard';
 import { FastifyRequest } from 'fastify';
@@ -16,5 +23,21 @@ export class ProjectController {
     @Request() req: FastifyRequest & { decoded: DecodedUser },
   ) {
     return await this.projectService.createProject(body, req.decoded.id);
+  }
+
+  @Get('/')
+  @UseGuards(AuthGuard)
+  async getAllProjects(
+    @Request() req: FastifyRequest & { decoded: DecodedUser },
+  ) {
+    return await this.projectService.getAllProjects(req.decoded.id);
+  }
+
+  @Get('/tasks')
+  @UseGuards(AuthGuard)
+  async getProjectWithTasks(
+    @Request() req: FastifyRequest & { decoded: DecodedUser },
+  ) {
+    return await this.projectService.getProjectWithTasks(req.decoded.id);
   }
 }

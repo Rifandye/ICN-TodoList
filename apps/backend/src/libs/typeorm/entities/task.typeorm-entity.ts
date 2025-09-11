@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { BaseTimestampzTypeOrmEntity } from './base-timestampz.typeorm-entity';
 import { ProjectTypeOrmEntity } from './project.typeorm-entity';
+import { UserTypeOrmEntity } from './user.typeorm-entity';
 
 @Entity({ name: 'tasks' })
 export class TaskTypeOrmEntity extends BaseTimestampzTypeOrmEntity {
@@ -32,6 +33,9 @@ export class TaskTypeOrmEntity extends BaseTimestampzTypeOrmEntity {
   @Column({ name: 'project_id', type: 'uuid', nullable: true })
   projectId: string | null;
 
+  @Column({ name: 'user_id', type: 'uuid', nullable: false })
+  userId: string;
+
   @Column({ name: 'due_date', type: 'timestamptz', nullable: true })
   dueDate: Date;
 
@@ -47,4 +51,8 @@ export class TaskTypeOrmEntity extends BaseTimestampzTypeOrmEntity {
   @ManyToOne(() => ProjectTypeOrmEntity, (project) => project.tasks)
   @JoinColumn({ name: 'project_id' })
   project?: ProjectTypeOrmEntity;
+
+  @ManyToOne(() => UserTypeOrmEntity, (user) => user.tasks)
+  @JoinColumn({ name: 'user_id' })
+  user: UserTypeOrmEntity;
 }
