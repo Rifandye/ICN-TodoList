@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ProjectTypeOrmEntity } from 'src/libs/typeorm/entities/project.typeorm-entity';
+import { TaskTypeOrmEntity } from 'src/libs/typeorm/entities/task.typeorm-entity';
 import { UserTypeOrmEntity } from 'src/libs/typeorm/entities/user.typeorm-entity';
 
 @Injectable()
@@ -8,7 +10,7 @@ export class TypeOrmPostgresService {
   constructor(private readonly configService: ConfigService) {}
 
   static getTypeOrmEntities() {
-    return [UserTypeOrmEntity];
+    return [UserTypeOrmEntity, ProjectTypeOrmEntity, TaskTypeOrmEntity];
   }
 
   getPostgresConnection(): TypeOrmModuleOptions {
