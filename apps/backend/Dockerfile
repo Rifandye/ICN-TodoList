@@ -19,7 +19,6 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 
-RUN pnpm install --frozen-lockfile --prod && rm -rf ~/.local/share/pnpm ~/.pnpm-store ~/.npm
+RUN pnpm install --prod && rm -rf ~/.local/share/pnpm ~/.pnpm-store ~/.npm
 
 CMD ["node", "dist/main.js"]
-    
