@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsDateString,
   IsNumber,
   IsOptional,
   IsString,
@@ -14,11 +15,28 @@ export class CreateTaskDto {
   @IsString()
   description: string;
 
+  @IsOptional()
+  @IsString()
+  status?: string;
+
   @IsNumber()
   priority: number;
 
+  @IsOptional()
   @IsString()
-  dueDate: string;
+  parentTaskId?: string;
+
+  @IsOptional()
+  @IsString()
+  projectId?: string;
+
+  @IsOptional()
+  @IsString()
+  userId?: string;
+
+  @IsDateString()
+  @IsOptional()
+  dueDate?: string;
 
   @IsOptional()
   @IsArray()
