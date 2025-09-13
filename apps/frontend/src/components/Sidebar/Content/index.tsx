@@ -61,12 +61,6 @@ export default function SidebarContentSection({ items }: ISidebarGroup) {
                               href={subItem.url}
                               className="flex items-center gap-3"
                             >
-                              {subItem.icon && (
-                                <subItem.icon
-                                  className="h-4 w-4"
-                                  color={isActiveSub ? "#F86800" : "#64748B"}
-                                />
-                              )}
                               <span
                                 className={`font-medium ${
                                   isActiveSub

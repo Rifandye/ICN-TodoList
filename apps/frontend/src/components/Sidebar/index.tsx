@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, DatabaseIcon, HomeIcon, Loader2 } from "lucide-react";
+import { DatabaseIcon, HomeIcon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,

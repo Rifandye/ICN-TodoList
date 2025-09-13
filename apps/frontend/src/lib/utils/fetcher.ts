@@ -11,6 +11,6 @@ export const fetcher = async <T = unknown>(key: {
     });
     return response.data;
   } catch (error) {
-    throw error as AxiosError<any>;
+    throw error as AxiosError;
   }
 };
