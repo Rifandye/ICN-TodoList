@@ -10,6 +10,6 @@ type SWRUrlObject = {
 export default function useBaseSWR<Data>(
   key: SWRUrlObject | null,
   config?: SWRConfiguration
-): SWRResponse<Data, AxiosError<any>> {
-  return useSWR<Data, AxiosError<any>>(key?.url ? key : null, fetcher, config);
+): SWRResponse<Data, AxiosError> {
+  return useSWR<Data, AxiosError>(key?.url ? key : null, fetcher, config);
 }
