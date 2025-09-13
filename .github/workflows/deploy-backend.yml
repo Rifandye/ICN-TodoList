@@ -30,11 +30,11 @@ jobs:
       - name: Build and push for development
         if: github.ref == 'refs/heads/development'
         run: |
-          docker build --build-arg NODE_ENV=production -t $DOCKER_USERNAME/icn-image:development-latest .
+          docker build --build-arg NODE_ENV=development -f apps/backend/Dockerfile -t $DOCKER_USERNAME/icn-image:development-latest apps/backend
           docker push $DOCKER_USERNAME/icn-image:development-latest
 
       - name: Build and push for production
         if: github.ref == 'refs/heads/main'
         run: |
-          docker build --build-arg NODE_ENV=production -t $DOCKER_USERNAME/icn-image:production-latest .
+          docker build --build-arg NODE_ENV=production -f apps/backend/Dockerfile -t $DOCKER_USERNAME/icn-image:production-latest apps/backend
           docker push $DOCKER_USERNAME/icn-image:production-latest
