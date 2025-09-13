@@ -3,4 +3,6 @@ packages:
 
 onlyBuiltDependencies:
   - '@nestjs/core'
+  - '@tailwindcss/oxide'
   - better-sqlite3
+  - sharp
