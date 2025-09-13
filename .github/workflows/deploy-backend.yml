@@ -1,0 +1,40 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - development
+      - main
+    paths:
+      - "apps/backend/**"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    environment: DEPLOYMENT
+
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx (optional, useful for multi-platform)
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+      - name: Build and push for development
+        if: github.ref == 'refs/heads/development'
+        run: |
+          docker build --build-arg NODE_ENV=production -t $DOCKER_USERNAME/icn-image:development-latest .
+          docker push $DOCKER_USERNAME/icn-image:development-latest
+
+      - name: Build and push for production
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker build --build-arg NODE_ENV=production -t $DOCKER_USERNAME/icn-image:production-latest .
+          docker push $DOCKER_USERNAME/icn-image:production-latest
