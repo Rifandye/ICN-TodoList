@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { ProjectTypeOrmEntity } from 'src/libs/typeorm/entities/project.typeorm-entity';
 import { EntityManager, In, Repository } from 'typeorm';
@@ -96,6 +100,51 @@ export class ProjectService {
     return projects;
   }
 
+  async getProjectByIdWithTasks(projectId: string, userId: string) {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId, userId },
+    });
+
+    if (!project) {
+      throw new Error('Project not found or access denied');
+    }
+
+    const tasks = await this.taskRepository.find({
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        priority: true,
+        dueDate: true,
+        parentTaskId: true,
+        projectId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      where: { projectId },
+      order: { createdAt: 'ASC' },
+    });
+
+    const taskMap = new Map<string, TaskTypeOrmEntity>();
+    tasks.forEach((task) => taskMap.set(task.id, { ...task, subtasks: [] }));
+
+    const rootTasks: TaskTypeOrmEntity[] = [];
+    for (const task of taskMap.values()) {
+      if (task.parentTaskId) {
+        const parent = taskMap.get(task.parentTaskId);
+        if (parent) {
+          parent.subtasks.push(task);
+        }
+      } else {
+        rootTasks.push(task);
+      }
+    }
+
+    project.tasks = rootTasks;
+    return project;
+  }
+
   async createProject(body: CreateProjectDto, userId: string) {
     const queryRunner = this.entityManager.connection.createQueryRunner();
     await queryRunner.connect();
@@ -148,5 +197,26 @@ export class ProjectService {
       console.error(error);
       throw error;
     }
+  }
+
+  async deleteProject(projectId: string, userId: string) {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+      relations: { tasks: true },
+    });
+
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+
+    if (project.userId !== userId) {
+      throw new UnauthorizedException(
+        'You are not authorized to delete this project',
+      );
+    }
+
+    await this.projectRepository.remove(project);
+
+    return { message: 'Project and associated tasks deleted successfully' };
   }
 }

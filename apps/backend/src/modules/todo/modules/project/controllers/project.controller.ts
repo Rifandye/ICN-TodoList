@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
+  ParseUUIDPipe,
   Post,
   Request,
   UseGuards,
@@ -39,5 +42,26 @@ export class ProjectController {
     @Request() req: FastifyRequest & { decoded: DecodedUser },
   ) {
     return await this.projectService.getProjectWithTasks(req.decoded.id);
+  }
+
+  @Get('/:id/tasks')
+  @UseGuards(AuthGuard)
+  async getProjectByIdWithTasks(
+    @Param('id') projectId: string,
+    @Request() req: FastifyRequest & { decoded: DecodedUser },
+  ) {
+    return await this.projectService.getProjectByIdWithTasks(
+      projectId,
+      req.decoded.id,
+    );
+  }
+
+  @Delete('/:id')
+  @UseGuards(AuthGuard)
+  async deleteProject(
+    @Param('id', ParseUUIDPipe) projectId: string,
+    @Request() req: FastifyRequest & { decoded: DecodedUser },
+  ) {
+    return await this.projectService.deleteProject(projectId, req.decoded.id);
   }
 }

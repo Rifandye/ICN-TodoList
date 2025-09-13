@@ -13,18 +13,6 @@ export interface ErrorApiResponse {
   };
 }
 
-export interface PaginatedResponse<T> {
-  success?: true;
-  message?: string;
-  data: T[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
-
 export interface NestResponse {
   message: string;
   error: string;
