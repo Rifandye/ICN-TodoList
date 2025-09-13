@@ -27,6 +27,8 @@ async function bootstrap() {
       ? process.env.ALLOWED_ORIGINS.split(',')
       : '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
   app.useGlobalFilters(new HttpExceptionFilter(), new JwtExceptionFilter());

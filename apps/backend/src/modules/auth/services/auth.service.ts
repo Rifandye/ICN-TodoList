@@ -75,4 +75,15 @@ export class AuthService {
 
     return { accessToken };
   }
+
+  async userProfile(userId: string) {
+    return await this.userRepository.findOne({
+      select: {
+        id: true,
+        userName: true,
+        fullName: true,
+      },
+      where: { id: userId },
+    });
+  }
 }

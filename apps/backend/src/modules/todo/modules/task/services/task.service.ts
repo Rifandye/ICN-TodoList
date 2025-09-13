@@ -7,13 +7,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TaskTypeOrmEntity } from 'src/libs/typeorm/entities/task.typeorm-entity';
 import { Repository } from 'typeorm';
 import { CreateTaskDto } from '../dtos/task.dto';
+import { TaskStatus } from '../enums/task.enum';
+import OpenAI from 'openai';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TaskService {
+  private readonly openAI: OpenAI;
+
   constructor(
     @InjectRepository(TaskTypeOrmEntity)
     private readonly taskRepository: Repository<TaskTypeOrmEntity>,
-  ) {}
+
+    private readonly configService: ConfigService,
+  ) {
+    this.openAI = new OpenAI({
+      baseURL: 'https://openrouter.ai/api/v1',
+      apiKey: this.configService.get<string>('OPENROUTER_API_KEY'),
+    });
+  }
 
   private async deleteSubtasksRecursive(task: TaskTypeOrmEntity) {
     if (task.subtasks && task.subtasks.length > 0) {
@@ -28,6 +40,43 @@ export class TaskService {
       }
     }
     await this.taskRepository.delete(task.id);
+  }
+
+  private getFallbackSuggestions(userInput: string): string[] {
+    const lowercaseInput = userInput.toLowerCase();
+
+    if (lowercaseInput.includes('learn') || lowercaseInput.includes('study')) {
+      return [
+        `Research basics about ${userInput.replace(/learn|study/gi, '').trim()}`,
+        `Find online courses or tutorials`,
+        `Practice with hands-on exercises`,
+      ];
+    }
+
+    if (lowercaseInput.includes('build') || lowercaseInput.includes('create')) {
+      return [
+        `Plan the structure and requirements`,
+        `Set up the development environment`,
+        `Implement the core functionality`,
+      ];
+    }
+
+    if (
+      lowercaseInput.includes('improve') ||
+      lowercaseInput.includes('better')
+    ) {
+      return [
+        `Identify areas that need improvement`,
+        `Research best practices and solutions`,
+        `Implement changes step by step`,
+      ];
+    }
+
+    return [
+      `Break down "${userInput}" into smaller steps`,
+      `Research tools and resources needed`,
+      `Create a timeline and start working`,
+    ];
   }
 
   async getAllTasks(userId: string) {
@@ -72,6 +121,7 @@ export class TaskService {
     const newTask = this.taskRepository.create({
       ...dto,
       userId,
+      status: TaskStatus.PENDING,
       projectId: projectId || null,
       parentTaskId: parentTaskId || null,
     });
@@ -115,5 +165,53 @@ export class TaskService {
     await this.deleteSubtasksRecursive(task);
 
     return { message: 'Task and its subtasks deleted successfully' };
+  }
+
+  async generateTaskSuggestions(userInput: string) {
+    try {
+      const completion = await this.openAI.chat.completions.create({
+        model: 'deepseek/deepseek-r1:free',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a helpful task management assistant. When given a general goal or topic, generate exactly 3 specific, actionable tasks that would help achieve that goal. 
+            
+            Rules:
+            - Each task should be clear, specific, and actionable
+            - Tasks should be realistic and achievable
+            - Return only the task titles, separated by newlines
+            - Do not include numbers, bullets, or any formatting
+            - Each task should be a single sentence
+            - Focus on practical, concrete actions`,
+          },
+          {
+            role: 'user',
+            content: `Generate 3 specific task suggestions for: "${userInput}"`,
+          },
+        ],
+      });
+
+      const aiResponse = completion.choices[0]?.message?.content?.trim();
+
+      if (!aiResponse) {
+        throw new Error('No response from AI service');
+      }
+
+      const suggestions = aiResponse
+        .split('\n')
+        .map((task) => task.trim())
+        .filter((task) => task.length > 0)
+        .slice(0, 3);
+
+      if (suggestions.length < 3) {
+        return this.getFallbackSuggestions(userInput);
+      }
+
+      return suggestions;
+    } catch (error) {
+      console.error('Error generating AI task suggestions:', error);
+
+      return this.getFallbackSuggestions(userInput);
+    }
   }
 }

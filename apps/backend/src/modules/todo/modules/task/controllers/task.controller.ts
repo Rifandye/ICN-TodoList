@@ -14,7 +14,7 @@ import { TaskService } from '../services/task.service';
 import { FastifyRequest } from 'fastify';
 import { DecodedUser } from 'src/libs/core/interfaces/decoded.interface';
 import { AuthGuard } from 'src/libs/core/guards/jwt-auth.guard';
-import { CreateTaskDto } from '../dtos/task.dto';
+import { CreateTaskDto, TaskSuggestionDto } from '../dtos/task.dto';
 
 @Controller('tasks')
 export class TaskController {
@@ -66,5 +66,18 @@ export class TaskController {
     @Request() req: FastifyRequest & { decoded: DecodedUser },
   ) {
     return await this.taskService.deleteTask(id, req.decoded.id);
+  }
+
+  @Post('/suggestions')
+  @UseGuards(AuthGuard)
+  async generateTaskSuggestions(@Body() body: TaskSuggestionDto) {
+    const suggestions = await this.taskService.generateTaskSuggestions(
+      body.userInput,
+    );
+
+    return {
+      userInput: body.userInput,
+      suggestions,
+    };
   }
 }

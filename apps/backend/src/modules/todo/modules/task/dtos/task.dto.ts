@@ -44,3 +44,8 @@ export class CreateTaskDto {
   @Type(() => CreateTaskDto)
   subTask?: CreateTaskDto[];
 }
+
+export class TaskSuggestionDto {
+  @IsString()
+  userInput: string;
+}
