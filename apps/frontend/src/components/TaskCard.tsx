@@ -26,54 +26,17 @@ import {
 import { ITask, TaskStatus } from "@/lib/interfaces/task.interface";
 import { baseApi } from "@/lib/axios/instance";
 import { EditTaskModal } from "./EditTaskModal";
+import BaseDialog from "./Dialog";
+import {
+  getPriorityColor,
+  getStatusColor,
+  getStatusLabel,
+} from "@/lib/utils/collorGetter";
 
 interface TaskCardProps {
   task: ITask;
   onUpdate?: () => void;
 }
-
-const getStatusColor = (status: TaskStatus) => {
-  switch (status) {
-    case "COMPLETED":
-      return "bg-green-100 text-green-800";
-    case "IN_PROGRESS":
-      return "bg-blue-100 text-blue-800";
-    case "PENDING":
-      return "bg-yellow-100 text-yellow-800";
-    case "CANCELLED":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
-const getStatusLabel = (status: TaskStatus) => {
-  switch (status) {
-    case "IN_PROGRESS":
-      return "In Progress";
-    case "COMPLETED":
-      return "Completed";
-    case "PENDING":
-      return "Pending";
-    case "CANCELLED":
-      return "Cancelled";
-    default:
-      return status;
-  }
-};
-
-const getPriorityColor = (priority: number) => {
-  switch (priority) {
-    case 1:
-      return "bg-red-100 text-red-800";
-    case 2:
-      return "bg-orange-100 text-orange-800";
-    case 3:
-      return "bg-green-100 text-green-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
 
 const getStatusIcon = (status: TaskStatus) => {
   switch (status) {
@@ -250,37 +213,18 @@ export function TaskCard({ task, onUpdate }: TaskCardProps) {
           </div>
         </div>
       </CardContent>
-
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Delete Task
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Are you sure you want to delete &quot;{task.title}&quot;? This
-              action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <Button
-                variant="outline"
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={isDeleting}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleDeleteTask}
-                disabled={isDeleting}
-              >
-                {isDeleting ? "Deleting..." : "Delete"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      <BaseDialog
+        title="Delete Task"
+        onSubmit={handleDeleteTask}
+        loading={isDeleting}
+        isOpen={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+      >
+        <p className="text-gray-600 mb-4">
+          Are you sure you want to delete &quot;{task.title}&quot;? This action
+          cannot be undone.
+        </p>
+      </BaseDialog>
       <EditTaskModal
         task={task}
         isOpen={showEditModal}

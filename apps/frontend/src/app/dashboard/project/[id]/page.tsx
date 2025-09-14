@@ -16,7 +16,7 @@ import useBaseSWR from "@/hooks/shared/useBaseSwr";
 import { BaseApiResponse } from "@/lib/interfaces/base.interface";
 import { IProjectWithTasks } from "@/lib/interfaces/task.interface";
 import { TaskCard } from "@/components/TaskCard";
-import { AddTaskModal } from "@/components/AddTaskModal";
+import { AddTaskModal } from "@/components/AddTaskModal/index";
 
 export default function ProjectDetailPage() {
   const params = useParams();

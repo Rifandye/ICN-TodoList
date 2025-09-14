@@ -8,9 +8,9 @@ import {
 } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { CreateUserDto, LoginDto } from '../dtos/auth.dto';
-import { FastifyRequest } from 'fastify';
 import { DecodedUser } from 'src/libs/core/interfaces/decoded.interface';
 import { AuthGuard } from 'src/libs/core/guards/jwt-auth.guard';
+import { FastifyRequest } from 'fastify';
 
 @Controller('auth')
 export class AuthController {
