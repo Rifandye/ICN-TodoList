@@ -32,7 +32,6 @@ async function bootstrap() {
   });
 
   app.useGlobalFilters(new HttpExceptionFilter(), new JwtExceptionFilter());
-
   app.useGlobalInterceptors(new ResponseInterceptor());
 
   //trigger

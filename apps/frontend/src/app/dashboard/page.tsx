@@ -4,12 +4,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ProjectCard } from "@/components/ProjectCard";
-import { AddProjectModal } from "@/components/AddProjectModal";
 import useBaseSWR from "@/hooks/shared/useBaseSwr";
 import { BaseApiResponse } from "@/lib/interfaces/base.interface";
 import { IProjectWithTasks } from "@/lib/interfaces/task.interface";
 import { useProjectStore } from "@/store/projectStore";
 import { toast } from "sonner";
+import { AddProjectModal } from "@/components/AddProjectModal/index";
 
 export default function DashboardPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
